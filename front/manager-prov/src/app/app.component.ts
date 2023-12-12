@@ -1,16 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
-import { PoMenuItem,
-  PoDialogService,
-  PoModalComponent,
-  PoTableAction,
-  PoTableColumn,
-  PoTableComponent,
-  PoBreadcrumbModule,
-  PoNotificationService
-} from '@po-ui/ng-components';
-
+import { HttpClient } from '@angular/common/http'; // Adicionado
+import { PoDialogService, PoModalComponent, PoTableAction, PoTableColumn, PoNotificationService } from '@po-ui/ng-components';
 import { AppService } from './app.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -22,11 +14,9 @@ export class AppComponent implements OnInit {
   poModal!: PoModalComponent;
   items: any;
   columns: Array<PoTableColumn> = [];
-  columnsDefault: Array<PoTableColumn> = [];
   detail: any;
   total: number = 0;
   totalExpanded = 0;
-  initialColumns: Array<any> = [];
   actions: Array<PoTableAction> = [
     {
       action: this.permission.bind(this),
@@ -34,41 +24,51 @@ export class AppComponent implements OnInit {
       label: 'Provision'
     },
     { action: this.permission.bind(this), icon: 'po-icon po-icon-security-guard', label: 'Resend Permission' },
-    { action: this.message.bind(this), icon: 'po-icon po-icon-mail', label: 'Messages' },
-    { action: this.idSecret.bind(this), icon: 'po-icon po-icon-settings', label: 'Acess config' },
+    { action: this.message.bind(this), icon: 'po-icon po-icon-message', label: 'Messages' },
+    { action: this.idSecret.bind(this), icon: 'po-icon po-icon-settings', label: 'Access config' },
     { action: this.details.bind(this), icon: 'po-icon-info', label: 'Details' }
   ];
-  breadcrumb: { label: any; }[] = [];
 
   constructor(
     private serviceApp: AppService,
     private poNotification: PoNotificationService,
     private poDialog: PoDialogService,
+    private httpClient: HttpClient
   ) {}
-  
 
   ngOnInit(): void {
-
     this.columns = this.serviceApp.getColumn();
     const oldItems: OldJsonItem[] = this.serviceApp.getClients();
-
-    // Transformar os itens para o novo formato
+    this.obterDadosDoEndpoint();
     this.items = oldItems.map(oldItem => this.transformToNewJsonFormat(oldItem));
-   
   }
+
   message(item: any) {
     this.detail = item;
     this.poNotification.warning('Request messages denied!');
   }
+
   permission(item: any) {
     this.detail = item;
     this.poNotification.success('Send Permission success!');
   }
+
   idSecret(item: any) {
     this.detail = item;
     this.poModal.open();
   }
 
+  obterDadosDoEndpoint(): void {
+    this.serviceApp.companyInfo().subscribe(
+      (data) => {
+        this.items = data;
+        console.log('Dados recebidos:', this.items);
+      },
+      (error) => {
+        console.error('Erro ao obter dados:', error);
+      }
+    );
+  }
 
   private transformToNewJsonFormat(oldItem: OldJsonItem): NewJsonItem {
     return {
@@ -97,6 +97,7 @@ export class AppComponent implements OnInit {
       },
     };
   }
+
   onCollapseDetail() {
     this.totalExpanded -= 1;
     this.totalExpanded = this.totalExpanded < 0 ? 0 : this.totalExpanded;
@@ -105,66 +106,63 @@ export class AppComponent implements OnInit {
   onExpandDetail() {
     this.totalExpanded += 1;
   }
+
   details(item: any) {
     this.detail = item;
-    this.breadcrumb = [
-      { label: (this.detail.tenantName).toUpperCase() }, 
-      { label: (this.detail.totvsCode).toUpperCase()},
-      { label: (this.detail.cnpj).toUpperCase() }
-    ];
-    this.detail['info']=this.detail.tenantName.trim().slice(0,20)+' > '+this.detail.totvsCode.trim()
     this.poModal.open();
+  }
+
+  onClick() {
+    alert('Po Button!');
   }
 }
 
-
-
-interface OldJsonItem {
-  id: number;
-  companyName: string;
-  tenantId: string;
-  racTenantId: string;
-  tenantName: string;
-  totvsCode: string;
-  adminName: string;
-  adminEmail: string;
-  cnpj: string;
-  phoneNumber: string;
-  apiKey: string;
-  connectorId: string;
-  carolTenantID: string;
-  dataInc: string;
-  dataFimProv: string;
-  acceptTerms: boolean;
-  idTerm: number;
-  origemOptin: string;
-  userIdOptin: string;
-  userNameOptin: string;
-  dataIncOptin: string;
-}
-
-interface NewJsonItem {
-  id: number;
-  companyName: string;
-  tenantName: string;
-  totvsCode: string;
-  cnpj: string;
-  adminName: string;
-  acceptTerms: boolean;
-  detail: {
-    adminEmail: string;
+  interface OldJsonItem {
+    id: number;
+    companyName: string;
     tenantId: string;
     racTenantId: string;
+    tenantName: string;
+    totvsCode: string;
+    adminName: string;
+    adminEmail: string;
+    cnpj: string;
     phoneNumber: string;
     apiKey: string;
     connectorId: string;
     carolTenantID: string;
     dataInc: string;
     dataFimProv: string;
+    acceptTerms: boolean;
     idTerm: number;
     origemOptin: string;
     userIdOptin: string;
     userNameOptin: string;
     dataIncOptin: string;
-  };
-}
+  }
+
+  interface NewJsonItem {
+    id: number;
+    companyName: string;
+    tenantName: string;
+    totvsCode: string;
+    cnpj: string;
+    adminName: string;
+    acceptTerms: boolean;
+    detail: {
+      adminEmail: string;
+      tenantId: string;
+      racTenantId: string;
+      phoneNumber: string;
+      apiKey: string;
+      connectorId: string;
+      carolTenantID: string;
+      dataInc: string;
+      dataFimProv: string;
+      idTerm: number;
+      origemOptin: string;
+      userIdOptin: string;
+      userNameOptin: string;
+      dataIncOptin: string;
+    };
+  }

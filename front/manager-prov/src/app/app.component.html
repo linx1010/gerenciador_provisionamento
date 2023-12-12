@@ -1,4 +1,6 @@
 
+    <po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
+    <po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-refresh"> </po-button>
     <po-table 
     [p-height]="400"
     [p-hide-batch-actions]="false"
@@ -10,10 +12,12 @@
     (p-collapsed)="onCollapseDetail()"
     (p-expanded)="onExpandDetail()"
     > 
-
     </po-table>
 
-<po-modal p-click-out="true" p-size="sm" p-title="{{ detail?.tenantName }}">
+<po-modal #modalDetails
+p-click-out="true" 
+p-size="sm" 
+p-title="{{ detail?.tenantName }}">
 <po-info class="po-sm-8" [p-label]="detail?.info"> </po-info>
 
 <!-- <po-textarea name="textarea" p-label="PO Textarea"> </po-textarea> -->
