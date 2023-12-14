@@ -1,6 +1,8 @@
 
-    <po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
-    <po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-refresh"> </po-button>
+<po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
+<po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-refresh"> </po-button>
+<po-loading-overlay *ngIf="loadingOverlay">
+</po-loading-overlay>
     <po-table 
     [p-height]="400"
     [p-hide-batch-actions]="false"
@@ -9,17 +11,21 @@
     [p-items]="items"
     [p-columns]="columns"
     [p-actions]="actions"
+    [p-sort]="true"
     (p-collapsed)="onCollapseDetail()"
     (p-expanded)="onExpandDetail()"
     > 
     </po-table>
-
 <po-modal #modalDetails
 p-click-out="true" 
 p-size="sm" 
 p-title="{{ detail?.tenantName }}">
 <po-info class="po-sm-8" [p-label]="detail?.info"> </po-info>
+<!-- <po-textarea name="textarea" p-label="{{legendTextArea}}" ></po-textarea> -->
+<p>{{formattedJson}}</p>
 
-<!-- <po-textarea name="textarea" p-label="PO Textarea"> </po-textarea> -->
+
+
+
 </po-modal>
 

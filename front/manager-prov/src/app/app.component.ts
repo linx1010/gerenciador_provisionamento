@@ -1,6 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; // Adicionado
-import { PoDialogService, PoModalComponent, PoTableAction, PoTableColumn, PoNotificationService } from '@po-ui/ng-components';
+import { PoDialogService, 
+  PoModalComponent, 
+  PoTableAction, 
+  PoTableColumn, 
+  PoNotificationService,
+  PoModule, 
+  PoFieldModule } from '@po-ui/ng-components';
 import { AppService } from './app.service';
 
 @Component({
@@ -17,6 +23,10 @@ export class AppComponent implements OnInit {
   detail: any;
   total: number = 0;
   totalExpanded = 0;
+  loadingOverlay = false;
+  legendTextArea : any;
+  formattedJson : any;
+
   actions: Array<PoTableAction> = [
     {
       action: this.permission.bind(this),
@@ -25,7 +35,7 @@ export class AppComponent implements OnInit {
     },
     { action: this.permission.bind(this), icon: 'po-icon po-icon-security-guard', label: 'Resend Permission' },
     { action: this.message.bind(this), icon: 'po-icon po-icon-message', label: 'Messages' },
-    { action: this.idSecret.bind(this), icon: 'po-icon po-icon-settings', label: 'Access config' },
+    { action: this.idSecret.bind(this), icon: 'po-icon po-icon-eye-off', label: 'Id and Secret' },
     { action: this.details.bind(this), icon: 'po-icon-info', label: 'Details' }
   ];
 
@@ -37,10 +47,10 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.legendTextArea = 'Overlay'
     this.columns = this.serviceApp.getColumn();
-    const oldItems: OldJsonItem[] = this.serviceApp.getClients();
-    this.obterDadosDoEndpoint();
-    this.items = oldItems.map(oldItem => this.transformToNewJsonFormat(oldItem));
+    this.loadingOverlay = true; // Ative o overlay
+    this.companysIn(); 
   }
 
   message(item: any) {
@@ -53,23 +63,64 @@ export class AppComponent implements OnInit {
     this.poNotification.success('Send Permission success!');
   }
 
-  idSecret(item: any) {
-    this.detail = item;
-    this.poModal.open();
-  }
+  // idSecret(item: any) {
+  //   this.detail = item;
+  //   this.poModal.open();
+  // }
 
-  obterDadosDoEndpoint(): void {
+  companysIn(): void {
     this.serviceApp.companyInfo().subscribe(
       (data) => {
-        this.items = data;
+        // Desative o overlay quando a requisição for concluída
+        this.loadingOverlay = false;
+        const oldItems: OldJsonItem[] = data;
+        this.items = oldItems.map(oldItem => this.transformToNewJsonFormat(oldItem));
         console.log('Dados recebidos:', this.items);
       },
       (error) => {
+        this.loadingOverlay = false;
         console.error('Erro ao obter dados:', error);
       }
-    );
+      );
+  }
+  idSecret(cnpj:string): void {
+    this.serviceApp.completeMessages(cnpj).subscribe(
+      (data) => {
+        // Desative o overlay quando a requisição for concluída
+        this.loadingOverlay = false;
+        const OldJsonItem:  = data;
+        console.log('Dados recebidos:', this.items);
+      },
+      (error) => {
+        this.loadingOverlay = false;
+        console.error('Erro ao obter dados:', error);
+      }
+      );
   }
 
+  
+  details(item: any) {
+    this.legendTextArea = 'Details'
+    this.detail = item;
+    // Converta o objeto JSON para uma string formatada com espaço de indentação de 2
+    const formattedJson = JSON.stringify(this.detail, null, 2);
+    // Atribua a string formatada à propriedade do seu componente (formattedJson)
+    this.formattedJson = formattedJson;
+    console.log(this.detail)
+    this.poModal.open();
+  }
+
+  onClick() {
+    alert('Po Button!');
+  }
+  onCollapseDetail() {
+    this.totalExpanded -= 1;
+    this.totalExpanded = this.totalExpanded < 0 ? 0 : this.totalExpanded;
+  }
+
+  onExpandDetail() {
+    this.totalExpanded += 1;
+  }
   private transformToNewJsonFormat(oldItem: OldJsonItem): NewJsonItem {
     return {
       id: oldItem.id,
@@ -96,24 +147,6 @@ export class AppComponent implements OnInit {
         dataIncOptin: oldItem.dataIncOptin,
       },
     };
-  }
-
-  onCollapseDetail() {
-    this.totalExpanded -= 1;
-    this.totalExpanded = this.totalExpanded < 0 ? 0 : this.totalExpanded;
-  }
-
-  onExpandDetail() {
-    this.totalExpanded += 1;
-  }
-
-  details(item: any) {
-    this.detail = item;
-    this.poModal.open();
-  }
-
-  onClick() {
-    alert('Po Button!');
   }
 }
 

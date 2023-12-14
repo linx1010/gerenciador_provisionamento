@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AppService {
-  private apiUrl = 'https://painel-backoffice.totvs.app/provisioning/api/Company/CompanyInfo';
+  private apiUrl = 'provisioning/api';
   private accessToken = 'D9A58469-7B5E-477B-83A8-B7FD463CB241';
 
   constructor(private http: HttpClient) {}
@@ -18,9 +18,20 @@ export class AppService {
       'accept': 'application/json',
       'x-access-token': this.accessToken,
     });
+    let url =this.apiUrl+'/Company/CompanyInfo'
 
     // Faz a requisição HTTP com os headers
-    return this.http.get(this.apiUrl, { headers });
+    return this.http.get(url, { headers });
+  }
+  completeMessages(cnpj: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'x-access-token': this.accessToken,
+    });
+    let url =this.apiUrl+'/Company/CompanyCompleteMessages/'+cnpj
+
+    // Faz a requisição HTTP com os headers
+    return this.http.get(url, { headers });
   }
 
   getColumn(): Array<PoTableColumn> {
