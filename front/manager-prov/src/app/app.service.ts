@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AppService {
-  private apiUrl = 'provisioning/api';
+  
   private accessToken = 'D9A58469-7B5E-477B-83A8-B7FD463CB241';
 
   constructor(private http: HttpClient) {}
@@ -18,7 +18,7 @@ export class AppService {
       'accept': 'application/json',
       'x-access-token': this.accessToken,
     });
-    let url =this.apiUrl+'/Company/CompanyInfo'
+    let url ='/provisioning/api/Company/CompanyInfo'
 
     // Faz a requisição HTTP com os headers
     return this.http.get(url, { headers });
@@ -28,11 +28,23 @@ export class AppService {
       'accept': 'application/json',
       'x-access-token': this.accessToken,
     });
-    let url =this.apiUrl+'/Company/CompanyCompleteMessages/'+cnpj
+    let url ='/provisioning/api/Company/CompanyCompleteMessages/'+cnpj
 
     // Faz a requisição HTTP com os headers
     return this.http.get(url, { headers });
   }
+  permissionSimulator(rac: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'x-access-token': this.accessToken,
+      'Ractenantid':rac
+    });
+    let url ='https://painel-backoffice.totvs.app/datalake/api/Manager/PermissionSimulator'
+    
+    // Faz a requisição HTTP com os headers
+    return this.http.get(url, { headers });
+  }
+  
 
   getColumn(): Array<PoTableColumn> {
     const columnDetail: PoTableDetail = {
@@ -45,20 +57,21 @@ export class AppService {
     };
     return [
       
-      { property: 'id', label: 'ID', type: 'number', color:'c' },
+      { property: 'id', label: 'ID', type: 'number',width: '01%' },
       {
         property: 'acceptTerms',
         label: 'accept Terms',
-        type: 'boolean',
-        color: (row: { acceptTerms: any; }) => (row.acceptTerms ? 'color-03' : 'color-07'),
-        boolean: {
-          trueLabel: 'Accept',
-          falseLabel: 'Not Accept'
-        }
+        type: 'label',
+        width: '10%',
+        labels: [
+          { value: 'accepted', color: '#2c85c8', label: 'Accepted', icon:'po-icon po-icon-ok'},
+          { value: 'notaccepted', color: '#c64840', label: 'Not Accepted', icon:'po-icon po-icon-close'}
+        ]
       },
-      { property: 'totvsCode', label: 'Totvs Code'},
-      { property: 'tenantName', label:'Tenant Name' },
-      { property: 'cnpj', label: 'CNPJ'},
+      { property: 'totvsCode',width: '19%', label: 'Totvs Code'},
+      { property: 'racTenantId',width: '30%', label: 'Tenant'},
+      { property: 'cnpj',width: '10%', label: 'CNPJ'},
+      { property: 'tenantName',width: '30%', label:'Tenant Name' },
       
       // { property: 'detail', label: 'Details', type: 'detail', detail: columnDetail }
     ];

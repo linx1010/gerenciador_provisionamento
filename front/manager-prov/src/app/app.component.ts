@@ -6,7 +6,10 @@ import { PoDialogService,
   PoTableColumn, 
   PoNotificationService,
   PoModule, 
-  PoFieldModule } from '@po-ui/ng-components';
+  PoFieldModule,
+  PoDynamicFormField,
+  PoDynamicFormFieldChanged,
+  } from '@po-ui/ng-components';
 import { AppService } from './app.service';
 import { PoCodeEditorComponent } from '@po-ui/ng-code-editor';
 
@@ -17,11 +20,12 @@ import { PoCodeEditorComponent } from '@po-ui/ng-code-editor';
   providers: [AppService, PoDialogService]
 })
 export class AppComponent implements OnInit {
-  @ViewChild(PoModalComponent, { static: true })
-  poModal!: PoModalComponent;
+  @ViewChild("modalDetails")modalDetails!: PoModalComponent;
+  @ViewChild("modalProvision")modalProvision!: PoModalComponent;
   @ViewChild("editor") editor!:PoCodeEditorComponent;
   items: any;
   columns: Array<PoTableColumn> = [];
+  fieldsForm:Array<PoDynamicFormField> = [];
   detail: any;
   total: number = 0;
   totalExpanded = 0;
@@ -30,13 +34,9 @@ export class AppComponent implements OnInit {
   formattedJson: string = '';
 
   actions: Array<PoTableAction> = [
-    {
-      action: this.permission.bind(this),
-      icon: 'po-icon po-icon-handshake',
-      label: 'Provision'
-    },
+    // { action: this.permission.bind(this),icon: 'po-icon po-icon-handshake',label: 'Re-Provision'},
+    // { action: this.message.bind(this), icon: 'po-icon po-icon-message', label: 'Messages' },
     { action: this.permission.bind(this), icon: 'po-icon po-icon-security-guard', label: 'Resend Permission' },
-    { action: this.message.bind(this), icon: 'po-icon po-icon-message', label: 'Messages' },
     { action: this.idSecret.bind(this), icon: 'po-icon po-icon-eye-off', label: 'Id and Secret' },
     { action: this.details.bind(this), icon: 'po-icon-info', label: 'Details' }
   ];
@@ -51,26 +51,38 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.legendTextArea = 'Overlay'
     this.columns = this.serviceApp.getColumn();
-    this.loadingOverlay = true; // Ative o overlay
+    this.formFieldsBuild();
     this.companysIn(); 
   }
-
+  onClick() {
+    alert('Not Yet!');
+  }
+  formFieldsBuild(){
+    //Campos do form para novo provisionamento (será descontinuado com atualização do Wizsmartba)
+    this.fieldsForm = [
+      { property: 'name', label:'User Fluig', required: true, showRequired: true },
+      {property: 'secretKey',label: 'Secret Key',secret: true,placeholder: 'Type your password'},
+      { property: 'totvsCode', label:'Totvs Code', required: true, showRequired: true },
+      { property: 'tenantName', label:'Tenant Name', required: true, showRequired: true },
+      { property: 'cnpj', label:'CNPJ', required: true, showRequired: true },
+      { property: 'phone', label:'Phone', required: true, showRequired: true, mask: '(99) 99999-9999'}
+    ];
+  };
   message(item: any) {
     this.detail = item;
     this.poNotification.warning('Request messages denied!');
   }
 
   permission(item: any) {
+    //Envio de nova permissão para o cliente
     this.detail = item;
-    this.poNotification.success('Send Permission success!');
+    this.resendPermission(item);
   }
 
-  // idSecret(item: any) {
-  //   this.detail = item;
-  //   this.poModal.open();
-  // }
 
   companysIn(): void {
+    // Recupera os clientes que realizaram o optin em nosso app
+    this.loadingOverlay = true; // Ative o overlay
     this.serviceApp.companyInfo().subscribe(
       (data) => {
         // Desative o overlay quando a requisição for concluída
@@ -86,7 +98,8 @@ export class AppComponent implements OnInit {
       );
   }
   idSecret(item:any): void {
-    
+    // recupera os dados das mensagens trocadas com o provisionamento da totvs (incluse Id e Secret de configuração)
+    this.detail = item;
     this.serviceApp.completeMessages(item['cnpj']).subscribe(
       (data) => {
         // Desative o overlay quando a requisição for concluída
@@ -96,7 +109,7 @@ export class AppComponent implements OnInit {
         this.formattedJson = formattedJson;
         this.editor.writeValue(this.formattedJson)
         console.log('Dados recebidos:', data);
-        this.poModal.open();
+        this.modalDetails.open();
       },
       (error) => {
         this.loadingOverlay = false;
@@ -104,9 +117,29 @@ export class AppComponent implements OnInit {
       }
       );
   }
+  resendPermission(item:any): void {
+    //Consumo do EndPoint de envio de nova permissao de acesso para I14
+    this.detail = item;
+    this.loadingOverlay = true;
+    this.serviceApp.permissionSimulator(item['racTenantId']).subscribe(
+      (data) => {
+        // Desative o overlay quando a requisição for concluída
+        this.loadingOverlay = false;
+        const formattedJson = JSON.stringify(data, null, 2);
+        this.poNotification.success('Send Permission success!');
+        console.log('Dados recebidos:', formattedJson);
+      },
+      (error) => {
+        this.loadingOverlay = false;
+        this.poNotification.error('Send Permission Fail!');
+        console.error('Erro ao obter dados:', error);
+      }
+      );
+  }
 
   
   details(item: any) {
+    //Apresenta todos os dados da linha selecionada
     this.legendTextArea = 'Details'
     this.detail = item;
     // Converta o objeto JSON para uma string formatada com espaço de indentação de 2
@@ -115,11 +148,16 @@ export class AppComponent implements OnInit {
     this.formattedJson = formattedJson;
     this.editor.writeValue(this.formattedJson)
     console.log(this.detail)
-    this.poModal.open();
+    this.modalDetails.open();
   }
 
-  onClick() {
-    alert('Po Button!');
+  provisionClick() {
+    //Abre o form de provisionamento
+    this.modalProvision.open();
+  }
+  onRefresh() {
+    // Botão de atualização de tela
+    this.companysIn();
   }
   onCollapseDetail() {
     this.totalExpanded -= 1;
@@ -129,19 +167,20 @@ export class AppComponent implements OnInit {
   onExpandDetail() {
     this.totalExpanded += 1;
   }
+  // encapsulamento de dados para exibição da tabela
   private transformToNewJsonFormat(oldItem: OldJsonItem): NewJsonItem {
     return {
       id: oldItem.id,
-      companyName: oldItem.companyName,
-      tenantName: oldItem.tenantName,
+      companyName: oldItem.companyName.trim(),
+      tenantName: oldItem.tenantName.trim(),
       totvsCode: oldItem.totvsCode,
-      cnpj: oldItem.cnpj,
+      cnpj: oldItem.cnpj.trim(),
       adminName: oldItem.adminName,
-      acceptTerms: oldItem.acceptTerms,
+      acceptTerms: oldItem.acceptTerms ? 'accepted' : 'notaccepted',
+      racTenantId: oldItem.racTenantId,
       detail: {
+        tenantId: oldItem.tenantId.trim(),
         adminEmail: oldItem.adminEmail,
-        tenantId: oldItem.tenantId,
-        racTenantId: oldItem.racTenantId,
         phoneNumber: oldItem.phoneNumber,
         apiKey: oldItem.apiKey,
         connectorId: oldItem.connectorId,
@@ -189,11 +228,11 @@ export class AppComponent implements OnInit {
     totvsCode: string;
     cnpj: string;
     adminName: string;
-    acceptTerms: boolean;
+    acceptTerms: string;
+    racTenantId: string;
     detail: {
-      adminEmail: string;
       tenantId: string;
-      racTenantId: string;
+      adminEmail: string;
       phoneNumber: string;
       apiKey: string;
       connectorId: string;

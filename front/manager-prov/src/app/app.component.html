@@ -1,6 +1,6 @@
 
-<po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
-<po-button p-label="" (p-click)="onClick()" p-icon="po-icon po-icon-refresh"> </po-button>
+<po-button p-label="" (p-click)="provisionClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
+<po-button p-label="" (p-click)="onRefresh()" p-icon="po-icon po-icon-change"> </po-button>
 <po-loading-overlay *ngIf="loadingOverlay">
 </po-loading-overlay>
     <po-table 
@@ -28,11 +28,12 @@ p-theme = "vs-dark"
 [p-readonly]="true"
 p-language = "json"
 p-height = "500"
-
 ></po-code-editor>
-
-
-
-
 </po-modal>
 
+<po-modal #modalProvision
+p-title = "Provisioning"
+p-size="lg">    
+    <po-dynamic-form [p-fields]="fieldsForm"> </po-dynamic-form>
+    <po-button p-label="Send" (p-click)="onClick()" p-icon="po-icon po-icon-handshake"> </po-button>
+</po-modal>
