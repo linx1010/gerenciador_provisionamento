@@ -8,6 +8,7 @@ import { PoDialogService,
   PoModule, 
   PoFieldModule } from '@po-ui/ng-components';
 import { AppService } from './app.service';
+import { PoCodeEditorComponent } from '@po-ui/ng-code-editor';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ import { AppService } from './app.service';
 export class AppComponent implements OnInit {
   @ViewChild(PoModalComponent, { static: true })
   poModal!: PoModalComponent;
+  @ViewChild("editor") editor!:PoCodeEditorComponent;
   items: any;
   columns: Array<PoTableColumn> = [];
   detail: any;
@@ -25,7 +27,7 @@ export class AppComponent implements OnInit {
   totalExpanded = 0;
   loadingOverlay = false;
   legendTextArea : any;
-  formattedJson : any;
+  formattedJson: string = '';
 
   actions: Array<PoTableAction> = [
     {
@@ -83,13 +85,18 @@ export class AppComponent implements OnInit {
       }
       );
   }
-  idSecret(cnpj:string): void {
-    this.serviceApp.completeMessages(cnpj).subscribe(
+  idSecret(item:any): void {
+    
+    this.serviceApp.completeMessages(item['cnpj']).subscribe(
       (data) => {
         // Desative o overlay quando a requisição for concluída
         this.loadingOverlay = false;
-        const OldJsonItem:  = data;
-        console.log('Dados recebidos:', this.items);
+        const formattedJson = JSON.stringify(data, null, 2);
+        // Atribua a string formatada à propriedade do seu componente (formattedJson)
+        this.formattedJson = formattedJson;
+        this.editor.writeValue(this.formattedJson)
+        console.log('Dados recebidos:', data);
+        this.poModal.open();
       },
       (error) => {
         this.loadingOverlay = false;
@@ -106,6 +113,7 @@ export class AppComponent implements OnInit {
     const formattedJson = JSON.stringify(this.detail, null, 2);
     // Atribua a string formatada à propriedade do seu componente (formattedJson)
     this.formattedJson = formattedJson;
+    this.editor.writeValue(this.formattedJson)
     console.log(this.detail)
     this.poModal.open();
   }

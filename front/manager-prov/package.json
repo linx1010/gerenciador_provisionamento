@@ -18,6 +18,7 @@
     "@angular/platform-browser": "~16.2.0",
     "@angular/platform-browser-dynamic": "~16.2.0",
     "@angular/router": "~16.2.0",
+    "@po-ui/ng-code-editor": "^16.8.0",
     "@po-ui/ng-components": "^16.8.0",
     "rxjs": "~7.5.5",
     "tslib": "^2.3.0",

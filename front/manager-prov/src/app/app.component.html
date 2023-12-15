@@ -18,11 +18,18 @@
     </po-table>
 <po-modal #modalDetails
 p-click-out="true" 
-p-size="sm" 
+p-size="lg" 
 p-title="{{ detail?.tenantName }}">
 <po-info class="po-sm-8" [p-label]="detail?.info"> </po-info>
 <!-- <po-textarea name="textarea" p-label="{{legendTextArea}}" ></po-textarea> -->
-<p>{{formattedJson}}</p>
+<!-- <p>{{formattedJson}}</p> -->
+<po-code-editor #editor
+p-theme = "vs-dark"
+[p-readonly]="true"
+p-language = "json"
+p-height = "500"
+
+></po-code-editor>
 
 
 
