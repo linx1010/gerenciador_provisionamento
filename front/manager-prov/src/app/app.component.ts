@@ -9,6 +9,9 @@ import { PoDialogService,
   PoFieldModule,
   PoDynamicFormField,
   PoDynamicFormFieldChanged,
+  PoDynamicFormComponent,
+  PoWidgetModule,
+  PoAccordionModule,
   } from '@po-ui/ng-components';
 import { AppService } from './app.service';
 import { PoCodeEditorComponent } from '@po-ui/ng-code-editor';
@@ -22,7 +25,11 @@ import { PoCodeEditorComponent } from '@po-ui/ng-code-editor';
 export class AppComponent implements OnInit {
   @ViewChild("modalDetails")modalDetails!: PoModalComponent;
   @ViewChild("modalProvision")modalProvision!: PoModalComponent;
+  @ViewChild('modalData') modalData!: PoModalComponent;
+
   @ViewChild("editor") editor!:PoCodeEditorComponent;
+  @ViewChild('formModalProvision') formModalProvision!: PoDynamicFormComponent;
+
   items: any;
   columns: Array<PoTableColumn> = [];
   fieldsForm:Array<PoDynamicFormField> = [];
@@ -32,12 +39,18 @@ export class AppComponent implements OnInit {
   loadingOverlay = false;
   legendTextArea : any;
   formattedJson: string = '';
+  formTitle: string = 'Provisioning';
+  labelSend :string = '';
+  iconToken : string = 'po-icon po-icon-lock-off';
+  iconButtonForm : string = 'po-icon po-icon-lock-off';
+  formData = {};
 
+  // po-icon po-icon-handshake
   actions: Array<PoTableAction> = [
     // { action: this.permission.bind(this),icon: 'po-icon po-icon-handshake',label: 'Re-Provision'},
-    // { action: this.message.bind(this), icon: 'po-icon po-icon-message', label: 'Messages' },
     { action: this.permission.bind(this), icon: 'po-icon po-icon-security-guard', label: 'Resend Permission' },
     { action: this.idSecret.bind(this), icon: 'po-icon po-icon-eye-off', label: 'Id and Secret' },
+    { action: this.onSendData.bind(this), icon: 'po-icon po-icon-chart-columns', label: 'Charts Analisys' },
     { action: this.details.bind(this), icon: 'po-icon-info', label: 'Details' }
   ];
 
@@ -49,13 +62,53 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.legendTextArea = 'Overlay'
+    this.legendTextArea = 'Overlay';
     this.columns = this.serviceApp.getColumn();
-    this.formFieldsBuild();
     this.companysIn(); 
   }
+  //botao generico para teste
   onClick() {
     alert('Not Yet!');
+  }
+  //abre modal para envio de dados
+  onSendData(item: any) {
+    this.detail = item;
+    this.modalData.open();
+  }
+  //botao para adicionar token de conexao
+  onClickAuthorize() {
+    if ('secretKey'in this.formModalProvision.value){
+      sessionStorage.setItem('token', this.formModalProvision.value['secretKey']);
+    }else{
+      sessionStorage.setItem('token', 'D9A58469-7B5E-477B-83A8-B7FD463CB241');
+    }
+    this.iconToken='po-icon po-icon-lock'
+    this.iconButtonForm = 'po-icon po-icon-lock'
+  }
+  
+  onClickSend() {
+    alert('Not Yet!');
+  }
+  
+  //central de controle do botao de envio form generico
+  onClickForm() {
+    switch( this.labelSend) {
+    case 'Send':
+      this.onClickSend()
+      break;
+    case 'Authorize':
+      this.onClickAuthorize()
+      break
+    default:
+      alert('Not Yet!');
+    }
+  }
+  onClickToken() {
+    this.formTitle = 'Authentication';
+    this.iconToken='po-icon po-icon-lock-off'
+    this.iconButtonForm = 'po-icon po-icon-lock-off'
+    this.formFieldsToken();
+    this.modalProvision.open();
   }
   formFieldsBuild(){
     //Campos do form para novo provisionamento (será descontinuado com atualização do Wizsmartba)
@@ -67,6 +120,15 @@ export class AppComponent implements OnInit {
       { property: 'cnpj', label:'CNPJ', required: true, showRequired: true },
       { property: 'phone', label:'Phone', required: true, showRequired: true, mask: '(99) 99999-9999'}
     ];
+    this.labelSend = 'Send'
+  };
+
+  formFieldsToken(){
+    //Campos do form para novo provisionamento (será descontinuado com atualização do Wizsmartba)
+    this.fieldsForm = [
+      {property: 'secretKey',label: 'Token',secret: true,placeholder: 'Type your token'},    
+    ];
+    this.labelSend = 'Authorize'
   };
   message(item: any) {
     this.detail = item;
@@ -94,12 +156,15 @@ export class AppComponent implements OnInit {
       (error) => {
         this.loadingOverlay = false;
         console.error('Erro ao obter dados:', error);
+        this.iconToken='po-icon po-icon-lock-off';
+        this.poNotification.warning('Request clients denied!');
       }
       );
   }
   idSecret(item:any): void {
     // recupera os dados das mensagens trocadas com o provisionamento da totvs (incluse Id e Secret de configuração)
     this.detail = item;
+    this.loadingOverlay = true;
     this.serviceApp.completeMessages(item['cnpj']).subscribe(
       (data) => {
         // Desative o overlay quando a requisição for concluída
@@ -152,11 +217,15 @@ export class AppComponent implements OnInit {
   }
 
   provisionClick() {
+    this.formTitle= 'Provisioning';
     //Abre o form de provisionamento
+    this.formFieldsBuild();
+    this.iconButtonForm = 'po-icon po-icon-handshake'
     this.modalProvision.open();
   }
   onRefresh() {
     // Botão de atualização de tela
+    this.items =[];
     this.companysIn();
   }
   onCollapseDetail() {

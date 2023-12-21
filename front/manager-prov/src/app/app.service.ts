@@ -9,11 +9,16 @@ import { Observable } from 'rxjs';
 })
 export class AppService {
   
-  private accessToken = 'D9A58469-7B5E-477B-83A8-B7FD463CB241';
+  private accessToken: string = '';
 
   constructor(private http: HttpClient) {}
 
+  getToken(): string {
+    const token = sessionStorage.getItem('token');
+    return token !== null ? token : '';
+  }
   companyInfo(): Observable<any> {
+    this.accessToken = this.getToken();
     const headers = new HttpHeaders({
       'accept': 'application/json',
       'x-access-token': this.accessToken,
@@ -24,6 +29,7 @@ export class AppService {
     return this.http.get(url, { headers });
   }
   completeMessages(cnpj: string): Observable<any> {
+    this.accessToken = this.getToken();
     const headers = new HttpHeaders({
       'accept': 'application/json',
       'x-access-token': this.accessToken,
@@ -34,6 +40,7 @@ export class AppService {
     return this.http.get(url, { headers });
   }
   permissionSimulator(rac: string): Observable<any> {
+    this.accessToken = this.getToken();
     const headers = new HttpHeaders({
       'accept': 'application/json',
       'x-access-token': this.accessToken,
@@ -45,6 +52,49 @@ export class AppService {
     return this.http.get(url, { headers });
   }
   
+  financialAlert(rac: string): Observable<any> {
+    this.accessToken = this.getToken();
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'x-access-token': this.accessToken,
+      'Ractenantid':rac,
+      'frequency':rac,
+      'companyGroup':rac,
+      'branchs':rac
+    });
+    let url ='https://painel-backoffice.totvs.app/datalake/api/CarolSubscription/GetData/FinancialForecast?retornarJson=true'
+    // Faz a requisição HTTP com os headers
+    return this.http.get(url, { headers });
+  }
+
+  
+  ruptureAlert(rac: string): Observable<any> {
+    this.accessToken = this.getToken();
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'x-access-token': this.accessToken,
+      'Ractenantid':rac
+    });
+    let url ='https://painel-backoffice.totvs.app/datalake/api/CarolSubscription/GetData/RuptureAlert?retornarJson=true'
+    // Faz a requisição HTTP com os headers
+    return this.http.get(url, { headers });
+  }
+  
+  demandAlert(rac: string): Observable<any> {
+    this.accessToken = this.getToken();
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'x-access-token': this.accessToken,
+      'Ractenantid':rac
+    });
+    let url ='https://painel-backoffice.totvs.app/datalake/api/CarolSubscription/GetData/DemandAlert?retornarJson=true'
+    // Faz a requisição HTTP com os headers
+    return this.http.get(url, { headers });
+  }
+  
+
+
+
 
   getColumn(): Array<PoTableColumn> {
     const columnDetail: PoTableDetail = {
@@ -76,7 +126,7 @@ export class AppService {
       // { property: 'detail', label: 'Details', type: 'detail', detail: columnDetail }
     ];
   }
-  getClients(){
+  getClientsMock(){
     return [
         {
           id: 1,
@@ -118,52 +168,6 @@ export class AppService {
           dataInc: '2023-04-05T22:05:41.226461',
           dataFimProv: '2023-04-06T11:59:11.729235',
           acceptTerms: false,
-          idTerm: 2,
-          origemOptin: '127.0.0.1',
-          userIdOptin: '000000',
-          userNameOptin: 'A',
-          dataIncOptin: '2023-01-01T00:00:00'
-        },
-        {
-          id: 5,
-          companyName: 'PRATICA KLIMAQUIP INDUSTRIA E COMERCIO SA-1623424331751',
-          tenantId: 'b33f2c28287d4fd7bef0ae8863617506',
-          racTenantId: 'b33f2c28-287d-4fd7-bef0-ae8863617506',
-          tenantName: 'PRATICA KLIMAQUIP INDUSTRIA E COMERCIO SA-1623424331751',
-          totvsCode: 'TAAKB1',
-          adminName: 'SquadBa',
-          adminEmail: 'squad.ba@totvs.com.br',
-          cnpj: '08574411000100',
-          phoneNumber: '011980404744',
-          apiKey: '8375efe296764a1a98bee47be1d6da4b',
-          connectorId: '72ac21c492ae46afac35bc924df080c9',
-          carolTenantID: '163697f637ac40a18f7e27b7ab97bd8f',
-          dataInc: '2023-04-05T22:05:41.226461',
-          dataFimProv: '2023-04-06T11:59:11.729235',
-          acceptTerms: true,
-          idTerm: 2,
-          origemOptin: '127.0.0.1',
-          userIdOptin: '000000',
-          userNameOptin: 'A',
-          dataIncOptin: '2023-01-01T00:00:00'
-        },
-        {
-          id: 6,
-          companyName: 'FCC DO BRASIL LTDA',
-          tenantId: 'vallfpdm8buaat2b1477654896330',
-          racTenantId: '28a9ca08-5be8-44c6-8846-3220bbe69048',
-          tenantName: 'FCC DO BRASIL LTDA',
-          totvsCode: 'T04858',
-          adminName: 'SquadBa',
-          adminEmail: 'squad.ba@totvs.com.br',
-          cnpj: '02672357000141',
-          phoneNumber: '011980404744',
-          apiKey: 'ef7f16003e4541b4b7d2289801018c5a',
-          connectorId: '01692c75281344da801c4bce780ce73a',
-          carolTenantID: '25de922b2bf94ea39fa5f99ad09b8ed3',
-          dataInc: '2023-04-05T22:05:41.226461',
-          dataFimProv: '2023-04-06T11:59:11.729235',
-          acceptTerms: true,
           idTerm: 2,
           origemOptin: '127.0.0.1',
           userIdOptin: '000000',

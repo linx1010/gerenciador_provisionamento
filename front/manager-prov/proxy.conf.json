@@ -1,5 +1,5 @@
 {
-  "/origin/*": {
+  "/provisioning/*": {
     "target": "https://painel-backoffice.totvs.app",
     "secure": false,
     "changeOrigin": true
