@@ -1,0 +1,85 @@
+<po-loading-overlay *ngIf="loadingOverlay">
+</po-loading-overlay>
+<po-table 
+[p-hide-batch-actions]="false"
+[p-hide-table-search]="false"
+[p-hide-text-overflow]="true"
+[p-items]="items"
+[p-columns]="columns"
+[p-actions]="actions"
+[p-sort]="true"
+(p-collapsed)="onCollapseDetail()"
+(p-expanded)="onExpandDetail()"
+[p-height]="400"
+> 
+</po-table>
+<po-button p-label="" (p-click)="provisionClick()" p-icon="po-icon po-icon-plus-circle"> </po-button>
+<po-button p-label="" (p-click)="onRefresh()" p-icon="po-icon po-icon-change"> </po-button>
+<po-button p-label="" (p-click)="onClickToken()" p-icon="{{iconToken}}"> </po-button>
+<po-modal #modalProvision
+    p-title = "{{formTitle}}"
+    (p-close)="onRefresh()"
+    p-size="lg">    
+    <po-dynamic-form 
+        [p-fields]="fieldsForm"
+        [p-value] = "formData" 
+        #formModalProvision> 
+    </po-dynamic-form>
+    <po-button p-label="{{labelSend}}" (p-click)="onClickForm()" p-icon="{{iconButtonForm}}"> </po-button>
+</po-modal>
+
+
+<po-modal #modalDetails
+    p-click-out="true" 
+    p-size="lg" 
+    p-title="{{ detail?.tenantName }}">
+    <po-info class="po-sm-8" [p-label]="detail?.info"> </po-info>
+    <po-code-editor #editor
+        p-theme = "vs-dark"
+        [p-readonly]="true"
+        p-language = "json"
+        p-height = "500"
+    ></po-code-editor>
+</po-modal>
+
+<po-modal #modalData
+    p-click-out="true" 
+    p-size="lg" 
+    p-title="{{ detail?.tenantName }}">
+        <po-widget
+            class="po-lg-3 po-mt-2"
+            (p-primary-action)="onClick()"
+            p-primary-label="Send Demand"
+            p-title="Demand Alert"
+            (p-secondary-action)="onClick()"
+            p-secondary-label="View Chart">
+    <div class="po-font-subtitle po-text-center">15</div>
+    <div class="po-text-center">Products on demand</div>
+  </po-widget>
+
+    <po-widget
+        class="po-lg-3 po-mt-2"
+        p-primary-label="Send Rupture"
+        p-title="Rupture Alert"
+        (p-secondary-action)="onClick()"
+        p-secondary-label="View Chart">
+        <div class="po-font-subtitle po-text-center">36</div>
+        <div class="po-text-center">Products analyzed</div>
+    </po-widget>
+
+    <po-widget
+        class="po-lg-3 po-mt-2"
+        p-primary-label="Send Financial"
+        p-title="Financial Alert"
+        (p-secondary-action)="onClick()"
+        p-secondary-label="View Chart">
+        <div class="po-font-subtitle po-text-center">2</div>
+        <div class="po-text-center">Alerts created</div>
+    </po-widget>
+    <po-accordion>
+        <po-accordion-item p-label="PO Accordion 1">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </po-accordion-item>
+    </po-accordion>
+</po-modal>
+
