@@ -1,1 +1,21 @@
 <p>home works!</p>
+<po-container>
+    <div class="po-row">
+        <div class="po-md-6">
+            <po-gauge 
+            [p-value]="96"
+            p-description="Clients with opt-in"
+            p-title="Opt-In"
+            ></po-gauge>
+        </div>
+        <div class="po-md-3">
+            <po-chart
+            [p-series]="[
+                { label: 'Angular', data: 100 },
+                { label: 'React', data: 10 }
+            ]"
+            >
+            </po-chart>
+        </div>
+    </div>
+</po-container>

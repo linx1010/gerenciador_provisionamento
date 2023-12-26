@@ -68,6 +68,8 @@ export class ManagementComponent implements OnInit {
     this.legendTextArea = 'Overlay';
     this.columns = this.serviceApp.getColumn();
     this.companysIn(); 
+    const token = sessionStorage.getItem('token');
+    this.iconToken = token ? 'po-icon po-icon-lock' : 'po-icon po-icon-lock-off';
   }
 
   
@@ -147,8 +149,10 @@ export class ManagementComponent implements OnInit {
     this.loadingOverlay = true;
     this.serviceApp.companyInfo().subscribe(
       (data) => {
+        // Desative o overlay quando a requisição for concluída
         this.loadingOverlay = false;
-        this.items= data;
+        const oldItems: OldJsonItem[] = data;
+        this.items = oldItems.map(oldItem => this.transformToNewJsonFormat(oldItem));
         console.log('Dados recebidos:', this.items);
       },
       (error) => {
@@ -227,7 +231,81 @@ export class ManagementComponent implements OnInit {
   onExpandDetail() {
     this.totalExpanded += 1;
   }
-
+  // encapsulamento de dados para exibição da tabela
+  private transformToNewJsonFormat(oldItem: OldJsonItem): NewJsonItem {
+    return {
+      id: oldItem.id,
+      companyName: oldItem.companyName.trim(),
+      tenantName: oldItem.tenantName.trim(),
+      totvsCode: oldItem.totvsCode,
+      cnpj: oldItem.cnpj.trim(),
+      adminName: oldItem.adminName,
+      acceptTerms: oldItem.acceptTerms ? 'accepted' : 'notaccepted',
+      racTenantId: oldItem.racTenantId,
+      detail: {
+        tenantId: oldItem.tenantId.trim(),
+        adminEmail: oldItem.adminEmail,
+        phoneNumber: oldItem.phoneNumber,
+        apiKey: oldItem.apiKey,
+        connectorId: oldItem.connectorId,
+        carolTenantID: oldItem.carolTenantID,
+        dataInc: oldItem.dataInc,
+        dataFimProv: oldItem.dataFimProv,
+        idTerm: oldItem.idTerm,
+        origemOptin: oldItem.origemOptin,
+        userIdOptin: oldItem.userIdOptin,
+        userNameOptin: oldItem.userNameOptin,
+        dataIncOptin: oldItem.dataIncOptin,
+      },
+    };
+  }
   
-  
+}
+interface OldJsonItem {
+  id: number;
+  companyName: string;
+  tenantId: string;
+  racTenantId: string;
+  tenantName: string;
+  totvsCode: string;
+  adminName: string;
+  adminEmail: string;
+  cnpj: string;
+  phoneNumber: string;
+  apiKey: string;
+  connectorId: string;
+  carolTenantID: string;
+  dataInc: string;
+  dataFimProv: string;
+  acceptTerms: boolean;
+  idTerm: number;
+  origemOptin: string;
+  userIdOptin: string;
+  userNameOptin: string;
+  dataIncOptin: string;
+}
+interface NewJsonItem {
+  id: number;
+  companyName: string;
+  tenantName: string;
+  totvsCode: string;
+  cnpj: string;
+  adminName: string;
+  acceptTerms: string;
+  racTenantId: string;
+  detail: {
+    tenantId: string;
+    adminEmail: string;
+    phoneNumber: string;
+    apiKey: string;
+    connectorId: string;
+    carolTenantID: string;
+    dataInc: string;
+    dataFimProv: string;
+    idTerm: number;
+    origemOptin: string;
+    userIdOptin: string;
+    userNameOptin: string;
+    dataIncOptin: string;
+  };
 }

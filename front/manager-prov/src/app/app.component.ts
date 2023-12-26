@@ -20,8 +20,8 @@ export class AppComponent implements OnInit {
   menuItemSelected: string = 'Home';
   
   menus = [
-    { label: 'Home', action: this.printMenuAction.bind(this), icon: 'po-icon-user' },
-    { label: 'Manager', action: this.printMenuAction.bind(this), icon: 'po-icon-user', shortLabel: 'Register' },
+    { label: 'Home', action: this.printMenuAction.bind(this), icon: 'po-icon po-icon-home' },
+    { label: 'Manager', action: this.printMenuAction.bind(this), icon: 'po-icon-settings', shortLabel: 'Register' },
     // Adicione outros itens conforme necessário
   ];
 

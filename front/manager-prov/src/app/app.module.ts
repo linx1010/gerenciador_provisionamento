@@ -12,6 +12,7 @@ import { PoTemplatesModule } from '@po-ui/ng-templates';
 import { HomeComponent } from './path/to/home/home.component'; // Importe seus componentes
 import { ManagementComponent } from './path/to/management/management.component';
 import { ManagementModule } from './path/to/management/management.module';
+import { HomeModule } from './path/to/home/home.module';
 
 
 const routes: Routes = [
@@ -36,7 +37,8 @@ const routes: Routes = [
     PoCodeEditorModule,
     PoTemplatesModule,
     PoPageModule,
-    ManagementModule
+    ManagementModule,
+    HomeModule
   ],
   exports: [RouterModule],
 
