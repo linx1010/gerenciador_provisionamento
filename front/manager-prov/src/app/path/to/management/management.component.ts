@@ -48,7 +48,7 @@ export class ManagementComponent implements OnInit {
   formData = {};
 
 
-  // po-icon po-icon-handshake
+  // Menu de acoes por linha
   actions: Array<PoTableAction> = [
     // { action: this.permission.bind(this),icon: 'po-icon po-icon-handshake',label: 'Re-Provision'},
     { action: this.permission.bind(this), icon: 'po-icon po-icon-security-guard', label: 'Resend Permission' },
@@ -72,12 +72,12 @@ export class ManagementComponent implements OnInit {
     this.iconToken = token ? 'po-icon po-icon-lock' : 'po-icon po-icon-lock-off';
   }
 
-  
+  // click para modal de analise detalhada dos graficos da linha
   onSendData(item: any) {
     this.detail = item;
     this.modalData.open();
   }
-
+//envio de token para a variavel de sessao
   onClickAuthorize() {
     if ('secretKey'in this.formModalProvision.value){
       sessionStorage.setItem('token', this.formModalProvision.value['secretKey']);
@@ -90,11 +90,12 @@ export class ManagementComponent implements OnInit {
   
   onClickSend() {
     alert('Not Yet!');
+    // this.onRefresh();
   }
   onClick() {
     alert('Not Yet!');
   }
-  
+  //controle do botao enviar do form generico
   onClickForm() {
     switch( this.labelSend) {
     case 'Send':
@@ -107,7 +108,7 @@ export class ManagementComponent implements OnInit {
       alert('Not Yet!');
     }
   }
-
+//abertura do modal de autenticacao
   onClickToken() {
     this.formTitle = 'Authentication';
     this.iconToken='po-icon po-icon-lock-off'
@@ -115,7 +116,7 @@ export class ManagementComponent implements OnInit {
     this.formFieldsToken();
     this.modalProvision.open();
   }
-
+//campos do form de provisionamento
   formFieldsBuild(){
     this.fieldsForm = [
       { property: 'name', label:'User Fluig', required: true, showRequired: true },
@@ -127,24 +128,24 @@ export class ManagementComponent implements OnInit {
     ];
     this.labelSend = 'Send'
   };
-
+//campos de form para envio do token
   formFieldsToken(){
     this.fieldsForm = [
       {property: 'secretKey',label: 'Token',secret: true,placeholder: 'Type your token'},    
     ];
     this.labelSend = 'Authorize'
   };
-  
+  //botao para postagem de dados para o smartlink
   message(item: any) {
     this.detail = item;
     this.poNotification.warning('Request messages denied!');
   }
-
+//renovacao de permissao do cliente via smartlink
   permission(item: any) {
     this.detail = item;
     this.resendPermission(item);
   }
-
+//retorna lista de clientes provisionados
   companysIn(): void {
     this.loadingOverlay = true;
     this.serviceApp.companyInfo().subscribe(
@@ -163,7 +164,7 @@ export class ManagementComponent implements OnInit {
       }
     );
   }
-
+//consumo endpoint para renovar token de acesso via smartlink
   idSecret(item:any): void {
     this.detail = item;
     this.loadingOverlay = true;
@@ -219,8 +220,13 @@ export class ManagementComponent implements OnInit {
   }
 
   onRefresh() {
-    this.items =[];
-    this.companysIn();
+    switch(this.labelSend){
+      case 'Send':
+        break
+      default:
+        this.items =[];
+        this.companysIn();
+    }
   }
 
   onCollapseDetail() {

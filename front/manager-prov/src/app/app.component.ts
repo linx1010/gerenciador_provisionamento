@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
 
   
   menuItemSelected: string = 'Home';
+  collapsed : boolean = true
   
   menus = [
     { label: 'Home', action: this.printMenuAction.bind(this), icon: 'po-icon po-icon-home' },
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
+    this.collapsed = true
   }
   //botao generico para teste
   onClick() {

@@ -1,19 +1,38 @@
-<p>home works!</p>
+<p>Macro Vision</p>
 <po-container>
     <div class="po-row">
         <div class="po-md-6">
+        <po-chart
+        [p-series]="[
+            { label: 'Complete', data: 96 },
+            { label: 'Not Complete', data: 4 }
+        ]"
+        [p-title]="titleOptin"
+        >
+        </po-chart>
+    </div>
+        <!-- <div class="po-md-6">
             <po-gauge 
-            [p-value]="96"
-            p-description="Clients with opt-in"
-            p-title="Opt-In"
+            [p-value]="optInPerc"
+            [p-description]="descOptin"
+            [p-title]="titleOptin"
+            ></po-gauge>
+        </div> -->
+          <div class="po-md-6">
+            <po-gauge 
+            [p-value]="forecastPerc"
+            [p-description]="descForecast"
+            [p-title]="titleForecast"
+            [p-ranges] = "forecastRanges"
             ></po-gauge>
         </div>
-        <div class="po-md-3">
+    </div>
+    <div class="po-row">
+        <div class="po-md-12">
             <po-chart
-            [p-series]="[
-                { label: 'Angular', data: 100 },
-                { label: 'React', data: 10 }
-            ]"
+            [p-series]="seriesColumn"
+            [p-categories]="categoriesColumn"
+            [p-title]="titleColumn"
             >
             </po-chart>
         </div>
