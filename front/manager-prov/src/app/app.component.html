@@ -1,21 +1,21 @@
+<div class="po-wrapper">
+    <po-menu 
+    [p-collapsed]="true"
+    [p-menus]="menus" >
+      <div *p-menu-header-template class="po-p-2 po-font-title sample-menu-header-text-color">
+        <p>Welcome,</p>
+        <p>
+          <b> User Admin </b>
+        </p>
+      </div>
+    </po-menu>
+  
+    <po-toolbar p-title="Managentment Provision" [p-show-notification]="false"></po-toolbar>
+  
+    <po-page-default [p-title]="menuItemSelected">
+        <router-outlet></router-outlet>
+    </po-page-default>
+  </div>
 
-    <po-table 
-    [p-height]="400"
-    [p-hide-batch-actions]="false"
-    [p-hide-table-search]="false"
-    [p-hide-text-overflow]="true"
-    [p-items]="items"
-    [p-columns]="columns"
-    [p-actions]="actions"
-    (p-collapsed)="onCollapseDetail()"
-    (p-expanded)="onExpandDetail()"
-    > 
-
-    </po-table>
-
-<po-modal p-click-out="true" p-size="sm" p-title="{{ detail?.tenantName }}">
-<po-info class="po-sm-8" [p-label]="detail?.info"> </po-info>
-
-<!-- <po-textarea name="textarea" p-label="PO Textarea"> </po-textarea> -->
-</po-modal>
-
+  
+  

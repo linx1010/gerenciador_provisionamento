@@ -1,11 +1,28 @@
-import { NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PoModule } from '@po-ui/ng-components';
+import { PoModule,PoPageModule  } from '@po-ui/ng-components';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { PoCodeEditorModule } from '@po-ui/ng-code-editor';
+import { PoTemplatesModule } from '@po-ui/ng-templates';
+
+import { HomeComponent } from './path/to/home/home.component'; // Importe seus componentes
+import { ManagementComponent } from './path/to/management/management.component';
+import { ManagementModule } from './path/to/management/management.module';
+import { HomeModule } from './path/to/home/home.module';
+
+
+const routes: Routes = [
+  { path: '', component: HomeComponent }, // Rota padrão
+  { path: 'home', component: HomeComponent },
+  { path: 'manager', component: ManagementComponent },
+  { path: 'management', component: ManagementComponent },
+  // Adicione mais rotas conforme necessário
+];
+
 
 @NgModule({
   declarations: [
@@ -16,8 +33,15 @@ import { RouterModule } from '@angular/router';
     AppRoutingModule,
     PoModule,
     HttpClientModule,
-    RouterModule.forRoot([])
+    [RouterModule.forRoot(routes)],
+    PoCodeEditorModule,
+    PoTemplatesModule,
+    PoPageModule,
+    ManagementModule,
+    HomeModule
   ],
+  exports: [RouterModule],
+
   providers: [],
   bootstrap: [AppComponent]
 })
